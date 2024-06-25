@@ -1,0 +1,3 @@
+# Atlas tools
+
+Provides a simple command line utility to perform common operations such as sending funds from one address to another. Makes use of [Atlas](https://github.com/geniusyield/atlas) under the hood. Get started by running `cabal run atlas-tools -- -h`, note that your environment should be able to compile Atlas, please consult the [documentation](https://atlas-app.io/getting-started/how-to-build) on how to achieve the same.
