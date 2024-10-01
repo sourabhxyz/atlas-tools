@@ -69,8 +69,10 @@ library
   -- Modules exported by the library.
   exposed-modules:
     AtlasTools.Options
+    AtlasTools.Orphans
     AtlasTools.Run
     AtlasTools.Send
+    AtlasTools.Utils
 
   -- Modules included in this library but not exported.
   -- other-modules:
@@ -81,6 +83,7 @@ library
     atlas-cardano,
     base ^>=4.18.2.1,
     optparse-applicative,
+    time,
 
   -- Directories containing source files.
   hs-source-dirs: src
