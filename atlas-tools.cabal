@@ -72,6 +72,7 @@ library
     AtlasTools.Orphans
     AtlasTools.Run
     AtlasTools.Send
+    AtlasTools.ClaimRewards
     AtlasTools.Utils
 
   -- Modules included in this library but not exported.

@@ -1,8 +1,6 @@
 module AtlasTools.Utils where
-  
 
-import GeniusYield.GYConfig (GYCoreConfig (cfgNetworkId), coreConfigIO, withCfgProviders)
-import GeniusYield.TxBuilder (runGYTxBuilderMonadIO, runGYTxQueryMonadIO, GYTxBuilderMonadIO)
+import GeniusYield.TxBuilder (GYTxBuilderMonadIO, runGYTxBuilderMonadIO)
 import GeniusYield.TxBuilder.Class
 import GeniusYield.Types
 

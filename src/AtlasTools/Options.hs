@@ -3,6 +3,7 @@
 module AtlasTools.Options (
   Command (..),
   SendAllToCfg (..),
+  ClaimRewardsCfg (..),
   PosixTimeToSlotCfg (..),
   parseCommand,
 ) where
@@ -12,7 +13,7 @@ import GeniusYield.Types
 import Options.Applicative
 import Text.Read (readMaybe)
 
-data Command = SendAllTo !SendAllToCfg | PosixTimeToSlot !PosixTimeToSlotCfg
+data Command = SendAllTo !SendAllToCfg | PosixTimeToSlot !PosixTimeToSlotCfg | ClaimRewards !ClaimRewardsCfg
 
 -- >>> read "1719314270198" :: POSIXTime
 
@@ -33,6 +34,30 @@ parseSendAllToCfg =
     <$> strOption (metavar "FROM_ADDR" <> help "Address to send all funds from" <> short 'f' <> long "from-addr")
     <*> strOption (metavar "TO_ADDR" <> help "Address to send all funds to" <> short 't' <> long "to-addr")
     <*> strOption (metavar "FROM_ADDR_PAYMENT_KEY_PATH" <> help "Payment signing key filepath for FROM_ADDR" <> short 'k' <> long "from-addr-payment-key-path")
+    <*> strOption (metavar "ATLAS_CONFIG" <> help "Atlas config filepath" <> short 'c' <> long "atlas-config")
+    <*> optional (strOption (metavar "WRITE_TX" <> help "Write transaction to file" <> short 'w' <> long "write-tx"))
+    <*> switch (long "dry-run" <> help "Dry run mode (will not submit the built transaction)" <> short 'd')
+    <*> optional (strOption (metavar "OUTPUT_TO_RESERVE" <> help "UTxO to reserve" <> short 'r' <> long "output-to-reserve"))
+
+data ClaimRewardsCfg = ClaimRewardsCfg
+  { fromAddr :: !GYAddressBech32
+  , toAddr :: !GYAddressBech32
+  , fromAddrPaymentKeyPath :: !FilePath
+  , stakeKeyPath :: !FilePath
+  , atlasConfig :: !FilePath
+  , mwriteTx :: !(Maybe FilePath)
+  , dryRun :: !Bool
+  , mcollateralToReserve :: !(Maybe GYTxOutRef)
+  }
+  deriving stock (Show)
+
+parseClaimRewardsCfg :: Parser ClaimRewardsCfg
+parseClaimRewardsCfg =
+  ClaimRewardsCfg
+    <$> strOption (metavar "FROM_ADDR" <> help "Address whose UTxOs would be used to build withdrawal transaction" <> short 'f' <> long "from-addr")
+    <*> strOption (metavar "TO_ADDR" <> help "Address to send claimed rewards to" <> short 't' <> long "to-addr")
+    <*> strOption (metavar "FROM_ADDR_PAYMENT_KEY_PATH" <> help "Payment signing key filepath for FROM_ADDR" <> short 'k' <> long "from-addr-payment-key-path")
+    <*> strOption (metavar "STAKE_KEY_PATH" <> help "Stake signing key filepath to claim rewards of" <> short 's' <> long "stake-key-path")
     <*> strOption (metavar "ATLAS_CONFIG" <> help "Atlas config filepath" <> short 'c' <> long "atlas-config")
     <*> optional (strOption (metavar "WRITE_TX" <> help "Write transaction to file" <> short 'w' <> long "write-tx"))
     <*> switch (long "dry-run" <> help "Dry run mode (will not submit the built transaction)" <> short 'd')
@@ -61,4 +86,5 @@ parseCommand =
     mconcat
       [ command "send-all-to" $ info (SendAllTo <$> parseSendAllToCfg <**> helper) $ progDesc "Send all funds from one address to another address, provided total funds are greater than or equal to 2 ADA and raises exception otherwise."
       , command "posix-time-to-slot" $ info (PosixTimeToSlot <$> parsePosixTimeToSlotCfg <**> helper) $ progDesc "Convert POSIX time to slot number."
+      , command "claim-rewards" $ info (ClaimRewards <$> parseClaimRewardsCfg <**> helper) $ progDesc "Claim rewards from a stake address."
       ]
